@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MSU Result Calculator (with Grace)</title>
+<style>
+  body{font-family:Arial,Helvetica,sans-serif;background:#f7f9fb;margin:0;padding:0}
+  header{background:#0056a3;color:#fff;padding:15px;text-align:center}
+  header h1{margin:0;font-size:22px}
+  header p{font-size:12px;font-weight:bold;margin-top:6px}
+  main{max-width:1000px;margin:20px auto;padding:20px;background:#fff;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1)}
+  .row{margin:10px 0}
+  label{margin-right:10px}
+  select,input{padding:6px;margin:5px}
+  button{padding:8px 16px;background:#0056a3;color:#fff;border:none;border-radius:5px;cursor:pointer}
+  button:hover{background:#004080}
+  h3{margin-top:25px;color:#333;border-bottom:2px solid #eee;padding-bottom:5px}
+  table{width:100%;border-collapse:collapse;margin-top:15px}
+  th,td{border:1px solid #ccc;padding:8px;text-align:center;font-size:14px}
+  th{background:#0056a3;color:#fff}
+  .pass{color:green;font-weight:bold}
+  .fail{color:red;font-weight:bold}
+  .grace{color:#c77700;font-weight:bold}
+</style>
+</head>
+<body>
+<header>
+  <h1>MSU Result Calculator (NEP UG/PG with Grace)</h1>
+  <p>यह Maa Shakumbhari University की कोई अधिकारिक साईट/ऐप नहीं है। केवल NEP Result और Grace Marks गणना के लिए बनाया गया है। यह केवल सूचना हेतु है, कहीं भी इसका प्रयोग न करें। Result गणना में त्रुटि संभव है।</p>
+</header>
+
+<main>
+  <!-- Program/Course/Sem Selection -->
+  <div class="row">
+    <label>Program:
+      <select id="programSelect" onchange="setProgram()">
+        <option value="">-- Select --</option>
+        <option value="UG">UG</option>
+        <option value="PG">PG</option>
+      </select>
+    </label>
+    <label>Course:
+      <select id="courseSelect">
+        <option value="">-- Select --</option>
+        <option>B.A.</option>
+        <option>B.Sc.</option>
+        <option>B.Com.</option>
+        <option>M.A.</option>
+        <option>M.Sc.</option>
+        <option>M.Com.</option>
+      </select>
+    </label>
+    <label>Semester:
+      <select id="semSelect">
+        <option value="">-- Select --</option>
+        <option>1</option><option>2</option><option>3</option><option>4</option>
+        <option>5</option><option>6</option>
+      </select>
+    </label>
+  </div>
+
+  <!-- Major Theory -->
+  <h3>Major Theory Subjects</h3>
+  <div id="majTheory">
+    <input class="mtExt" placeholder="External Marks (75)">
+    <input class="mtInt" placeholder="Internal Marks (25)">
+    <br>
+    <input class="mtExt" placeholder="External Marks (75)">
+    <input class="mtInt" placeholder="Internal Marks (25)">
+    <br>
+    <input class="mtExt" placeholder="External Marks (75)">
+    <input class="mtInt" placeholder="Internal Marks (25)">
+  </div>
+
+  <!-- Major Practical -->
+  <h3>Major Practical</h3>
+  <div id="majPrac">
+    <input class="mpExt" placeholder="External Marks (75)">
+    <input class="mpInt" placeholder="Internal Marks (25)">
+  </div>
+
+  <!-- Minor -->
+  <h3>Minor Subject</h3>
+  <div id="minorBox" style="display:none">
+    <input class="mnExt" placeholder="External Marks (75)">
+    <input class="mnInt" placeholder="Internal Marks (25)">
+  </div>
+  <button type="button" onclick="document.getElementById('minorBox').style.display='block'">+ Add Minor</button>
+
+  <!-- Skill -->
+  <h3>Skill Development</h3>
+  <div id="skillBox" style="display:none">
+    <input class="skExt" placeholder="Theory Marks (40)">
+    <input class="skInt" placeholder="Practical Marks (60)">
+  </div>
+  <button type="button" onclick="document.getElementById('skillBox').style.display='block'">+ Add Skill</button>
+
+  <!-- Co Curricular -->
+  <h3>Co-Curricular</h3>
+  <input class="coExternal" placeholder="External Marks (75)">
+  <input class="coInternal" placeholder="Internal Marks (25)">
+
+  <!-- Project -->
+  <h3>Project / Dissertation</h3>
+  <div id="projectBox" style="display:none">
+    <input class="prjMarks" placeholder="Project Marks">
+  </div>
+  <button type="button" onclick="document.getElementById('projectBox').style.display='block'">+ Add Project</button>
+
+  <div class="row">
+    <button type="button" onclick="calculateResult()">Calculate Result</button>
+  </div>
+
+  <!-- Result Table -->
+  <table id="resultTable">
+    <thead>
+      <tr>
+        <th>Subject</th><th>Ext Marks</th><th>Grace</th><th>Ext (After Grace)</th><th>Int</th><th>Total</th><th>Status</th><th>Remark</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <h3 id="overall"></h3>
+</main>
+
+<script>
+  let PROGRAM="";
+
+  function setProgram(){ PROGRAM=document.getElementById("programSelect").value; }
+
+  // --------- Config ----------
+  const UG_PASS_TOTAL_MIN   = 33;     
+  const PG_PASS_TOTAL_MIN   = 40;     
+  const PASS_UE_MIN         = 25;     
+  const UG_PROJECT_PASS     = 40;     
+  const PG_PROJECT_PASS     = 200;    
+  const UG_CO_PASS          = 33;     
+  const UG_SKILL_PASS       = 40;     
+  const UG_MAX_GRACE        = 5;      
+  const PG_MAX_GRACE_SUB1   = 5;      
+  const PG_MAX_GRACE_SUB2   = 3;      
+
+  function checkPass(subj, extNow){
+    const total = extNow + subj.internal;
+    if(subj.type==="major"||subj.type==="minor"||subj.type==="majorPractical"){
+      const minTotal = (PROGRAM==="UG") ? UG_PASS_TOTAL_MIN : PG_PASS_TOTAL_MIN;
+      if(extNow < PASS_UE_MIN) return false;
+      return total >= minTotal;
+    }
+    if(subj.type==="skill"){ return total >= UG_SKILL_PASS; }
+    if(subj.type==="co"){ return total >= UG_CO_PASS; }
+    if(subj.type==="project"){
+      if(PROGRAM==="UG") return total >= UG_PROJECT_PASS;
+      if(PROGRAM==="PG") return total >= PG_PROJECT_PASS;
+    }
+    return false;
+  }
+
+  function applyGrace(subjects){
+    let failedSubs = subjects.filter(s=> !checkPass(s,s.ext));
+    if(failedSubs.length===0) return;
+
+    if(PROGRAM==="UG"){
+      let applied = 0;
+      for(let i=0;i<failedSubs.length && applied<2;i++){
+        let s = failedSubs[i];
+        if(["major","minor","majorPractical","skill","co"].includes(s.type)){
+          let needUE = (s.ext<PASS_UE_MIN) ? (PASS_UE_MIN-s.ext) : 0;
+          let needTot = (UG_PASS_TOTAL_MIN-(s.ext+s.internal));
+          if(s.type==="skill") needTot=(UG_SKILL_PASS-(s.ext+s.internal));
+          if(s.type==="co") needTot=(UG_CO_PASS-(s.ext+s.internal));
+          if(s.type==="project") needTot=(UG_PROJECT_PASS-(s.ext+s.internal));
+          let need = Math.max(needUE, needTot);
+          if(need>0 && need<=UG_MAX_GRACE){
+            s.ext += need; s.grace += need; applied++;
+          }
+        }
+      }
+    }
+
+    if(PROGRAM==="PG"){
+      let applied=0;
+      for(let i=0;i<failedSubs.length && applied<2;i++){
+        let s = failedSubs[i];
+        if(["major","minor","majorPractical"].includes(s.type)){
+          let needUE = (s.ext<PASS_UE_MIN) ? (PASS_UE_MIN-s.ext) : 0;
+          let needTot = (PG_PASS_TOTAL_MIN-(s.ext+s.internal));
+          let need = Math.max(needUE, needTot);
+          if(need>0){
+            let allow = (applied===0) ? PG_MAX_GRACE_SUB1 : PG_MAX_GRACE_SUB2;
+            if(need<=allow){
+              s.ext += need; s.grace += need; applied++;
+            }
+          }
+        }
+      }
+    }
+
+    let anyFail = subjects.some(s=> !checkPass(s,s.ext));
+    if(anyFail){
+      subjects.forEach(s=>{ if(s.grace>0){ s.ext -= s.grace; s.grace=0; } });
+    }
+  }
+
+  function calculateResult(){
+    if(!PROGRAM){ alert("Please select Program (UG/PG)."); return; }
+
+    let subjects=[]; 
+    function pushGroup(extCls,intCls,type,display){
+      const exts=document.querySelectorAll("."+extCls);
+      const ints=intCls?document.querySelectorAll("."+intCls):[];
+      exts.forEach((el,i)=>{
+        const ext = Number(el.value)||0;
+        const intr= intCls? (Number(ints[i].value)||0) : 0;
+        if(ext||intr){
+          subjects.push({name:`${display} ${i+1}`, type, ext, internal:intr, grace:0});
+        }
+      });
+    }
+    pushGroup("mtExt","mtInt","major","Major Theory");
+    pushGroup("mpExt","mpInt","majorPractical","Major Practical");
+    if(document.getElementById("minorBox").style.display!=="none") pushGroup("mnExt","mnInt","minor","Minor");
+    if(document.getElementById("skillBox").style.display!=="none") pushGroup("skExt","skInt","skill","Skill");
+    const coE=Number(document.querySelector(".coExternal").value)||0;
+    const coI=Number(document.querySelector(".coInternal").value)||0;
+    if(coE||coI) subjects.push({name:"Co-Curricular", type:"co", ext:coE, internal:coI, grace:0});
+    if(document.getElementById("projectBox").style.display!=="none") pushGroup("prjMarks",null,"project","Project/Dissertation");
+
+    if(subjects.length===0){ alert("Please enter some marks first."); return; }
+
+    applyGrace(subjects);
+
+    const tbody=document.querySelector("#resultTable tbody"); tbody.innerHTML="";
+    subjects.forEach(subj=>{
+      const total=subj.ext+subj.internal;
+      const passNow = checkPass(subj,subj.ext);
+      let status = passNow ? "Pass":"Fail";
+      let remark = passNow ? "OK":"";
+      if(!passNow){
+        if(["major","minor","majorPractical"].includes(subj.type)){
+          if(subj.ext<PASS_UE_MIN) remark=`Need ${PASS_UE_MIN-subj.ext} more in External`;
+          else remark=`Need more in Total`;
+        }
+      }
+      if(subj.grace>0) remark=`Grace Applied: ${subj.grace}`;
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td>${subj.name}</td>
+        <td>${subj.ext - subj.grace}</td>
+        <td class="grace">${subj.grace}</td>
+        <td>${subj.ext}</td>
+        <td>${subj.internal}</td>
+        <td>${total}</td>
+        <td class="${status==='Pass'?'pass':'fail'}">${status}</td>
+        <td>${remark}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    const overallEl=document.getElementById("overall");
+    if(subjects.some(s=> !checkPass(s,s.ext))){
+      overallEl.innerHTML=`Overall Result: <span class="fail">FAIL (ग्रेस मिलने के बाद भी बैक है)</span>`;
+    } else {
+      const g=subjects.reduce((sum,s)=> sum+s.grace,0);
+      overallEl.innerHTML = g>0 ? 
+        `Overall Result: <span class="pass">PASS with Grace (${g} Marks)</span>` :
+        `Overall Result: <span class="pass">PASS</span>`;
+    }
+  }
+</script>
+</body>
+</html>
