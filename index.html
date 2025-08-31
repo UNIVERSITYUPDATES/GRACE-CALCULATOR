@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MSU Result Calculator (Mobile 3D UI)</title>
+<title>MSU Result Calculator</title>
 <style>
   body{font-family:Arial,Helvetica,sans-serif;background:#eef2f5;margin:0;padding:0}
   header{background:#004080;color:#fff;padding:15px;text-align:center;box-shadow:0 3px 6px rgba(0,0,0,0.2)}
@@ -14,13 +14,13 @@
   .row{margin:10px 0;display:flex;flex-wrap:wrap;gap:10px}
   label{font-size:12px}
   select,input{padding:6px;font-size:12px;border:1px solid #bbb;border-radius:6px}
-  input[type=number]{width:38px;text-align:center}
+  input[type=number]{width:45px;text-align:center}
   button{padding:6px 10px;background:#0056a3;color:#fff;border:none;border-radius:6px;
          box-shadow:0 3px 6px rgba(0,0,0,0.2);cursor:pointer;font-size:12px}
   button:hover{background:#003d73}
   h3{margin-top:20px;color:#333;border-bottom:1px solid #ddd;padding-bottom:5px}
   .inputRow{margin:6px 0;padding:6px;background:#f9fbff;border-radius:8px;
-            box-shadow:inset 0 2px 4px rgba(0,0,0,0.1);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+            box-shadow:inset 0 2px 4px rgba(0,0,0,0.1);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .inputRow label{font-weight:bold;font-size:12px}
   .removeBtn{background:#d9534f !important}
   table{width:100%;border-collapse:collapse;margin-top:12px;font-size:12px}
@@ -29,7 +29,6 @@
   .pass{color:green;font-weight:bold}
   .fail{color:red;font-weight:bold}
   .grace{color:#c77700;font-weight:bold}
-  #note{margin-top:15px;font-size:11px;color:#555}
 </style>
 </head>
 <body>
@@ -72,18 +71,12 @@
   <table id="resultTable">
     <thead>
       <tr>
-        <th>Subj</th><th>EXT</th><th>Grace</th><th>EXT+</th><th>INT</th><th>Total</th><th>Status</th><th>Remark</th>
+        <th>Subject</th><th>EXT</th><th>Grace</th><th>EXT+</th><th>INT</th><th>Total</th><th>Status</th><th>Remark</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
   <h3 id="overall"></h3>
-
-  <!-- Abbreviation Note -->
-  <div id="note">
-    <b>Note:</b><br>
-    EXT = External, INT = Internal, TH. = Theory, PH. = Practical, CO-CR. = Co-Curricular, SKILL = Skill Development, PROJ. = Project
-  </div>
 </main>
 
 <!-- jsPDF & AutoTable -->
@@ -111,12 +104,12 @@ function setProgram(){
     for(let i=1;i<=6;i++){ let op=document.createElement("option"); op.text=i; semSel.add(op); }
 
     btnBox.innerHTML=`
-      <button onclick="addSubject('major')">+ Major TH.</button>
-      <button onclick="addSubject('majorPractical')">+ Major PH.</button>
-      <button onclick="addSubject('minor')">+ Minor</button>
-      <button onclick="addSubject('skill')">+ SKILL</button>
-      <button onclick="addSubject('co')">+ CO-CR.</button>
-      <button onclick="addSubject('project')">+ PROJ.</button>`;
+      <button onclick="addSubject('Major Theory')">+ Major Theory</button>
+      <button onclick="addSubject('Major Practical')">+ Major Practical</button>
+      <button onclick="addSubject('Minor')">+ Minor</button>
+      <button onclick="addSubject('Skill Development')">+ Skill Development</button>
+      <button onclick="addSubject('Co-Curricular')">+ Co-Curricular</button>
+      <button onclick="addSubject('Project')">+ Project</button>`;
   }
   else if(PROGRAM==="PG"){
     ["M.A.","M.Sc.","M.Com."].forEach(c=>{
@@ -125,10 +118,10 @@ function setProgram(){
     for(let i=1;i<=4;i++){ let op=document.createElement("option"); op.text=i; semSel.add(op); }
 
     btnBox.innerHTML=`
-      <button onclick="addSubject('major')">+ Major TH.</button>
-      <button onclick="addSubject('majorPractical')">+ Major PH.</button>
-      <button onclick="addSubject('minor')">+ Minor</button>
-      <button onclick="addSubject('project')">+ PROJ.</button>`;
+      <button onclick="addSubject('Major Theory')">+ Major Theory</button>
+      <button onclick="addSubject('Major Practical')">+ Major Practical</button>
+      <button onclick="addSubject('Minor')">+ Minor</button>
+      <button onclick="addSubject('Project')">+ Project</button>`;
   }
 }
 
@@ -136,26 +129,17 @@ function addSubject(type){
   subjId++;
   const box=document.getElementById("subjectContainer");
   let html="";
-  if(type==="major"||type==="minor"||type==="majorPractical"||type==="co"){
+  if(type==="Project"){
     html=`<div class="inputRow" id="row${subjId}">
-      <label>${type.toUpperCase()}:</label>
-      EXT <input type="number" maxlength="2" data-type="${type}" data-kind="ext">
-      INT <input type="number" maxlength="2" data-type="${type}" data-kind="int">
+      <label>${type}:</label>
+      Marks <input type="number" maxlength="3" data-subject="${type}" data-kind="ext">
       <button class="removeBtn" onclick="removeSubject(${subjId})">x</button>
     </div>`;
-  }
-  else if(type==="skill"){
+  } else {
     html=`<div class="inputRow" id="row${subjId}">
-      <label>SKILL:</label>
-      TH. <input type="number" maxlength="2" data-type="skill" data-kind="ext">
-      PH. <input type="number" maxlength="2" data-type="skill" data-kind="int">
-      <button class="removeBtn" onclick="removeSubject(${subjId})">x</button>
-    </div>`;
-  }
-  else if(type==="project"){
-    html=`<div class="inputRow" id="row${subjId}">
-      <label>PROJ.:</label>
-      Marks <input type="number" maxlength="3" data-type="project" data-kind="ext">
+      <label>${type}:</label>
+      EXT <input type="number" maxlength="2" data-subject="${type}" data-kind="ext">
+      INT <input type="number" maxlength="2" data-subject="${type}" data-kind="int">
       <button class="removeBtn" onclick="removeSubject(${subjId})">x</button>
     </div>`;
   }
@@ -163,24 +147,71 @@ function addSubject(type){
 }
 function removeSubject(id){document.getElementById("row"+id).remove();}
 
-// Placeholder calculation (replace with real grace logic)
 function calculateResult(){
   const tbody=document.querySelector("#resultTable tbody");
   tbody.innerHTML="";
   let rows=document.querySelectorAll("#subjectContainer .inputRow");
   let overall="PASS";
+  let graceLeft=5, graceUsed=0, graceSubjects=0;
+
   rows.forEach(r=>{
     let inputs=r.querySelectorAll("input");
+    let type=inputs[0].dataset.subject;
     let ext=Number(inputs[0].value||0);
     let int=inputs[1]?Number(inputs[1].value||0):0;
-    let tot=ext+int;
-    let status=tot>=33?"PASS":"FAIL";
-    if(status==="FAIL")overall="FAIL";
+    let total=ext+int;
+    let passUE=0, passTotal=0;
+
+    if(PROGRAM==="UG"){
+      if(type==="Skill Development") passTotal=40, passUE=0;
+      else if(type==="Co-Curricular") passTotal=33, passUE=0;
+      else if(type==="Project") passTotal=40, passUE=0;
+      else { passTotal=33; passUE=10; }
+    }
+    else if(PROGRAM==="PG"){
+      if(type==="Project") passTotal=40, passUE=0;
+      else { passTotal=40; passUE=13; }
+    }
+
+    let status="PASS", remark="-", grace=0;
+    if(total<passTotal || (passUE>0 && ext<passUE)){
+      // Need Grace?
+      let needUE=passUE>0?Math.max(0,passUE-ext):0;
+      let needTot=Math.max(0,passTotal-total);
+      let need=Math.max(needUE, needTot);
+
+      if(need>0){
+        let canApply=false;
+        if(PROGRAM==="UG" && type!=="Project"){
+          if(graceSubjects<2 && graceUsed+need<=5){
+            canApply=true;
+          }
+        }
+        else if(PROGRAM==="PG" && type!=="Skill Development" && type!=="Co-Curricular" && type!=="Project"){
+          if(need<=3 && graceSubjects<2 && graceUsed+need<=5){
+            canApply=true;
+          }
+        }
+        if(canApply){
+          grace=need;
+          ext+=grace;
+          total=ext+int;
+          status="PASS"; remark="Grace Applied";
+          graceUsed+=grace; graceSubjects++;
+        } else {
+          status="FAIL"; remark="Need "+need+" marks";
+          overall="FAIL";
+        }
+      } else {
+        status="FAIL"; remark="Below Passing";
+        overall="FAIL";
+      }
+    }
+
     tbody.innerHTML+=`<tr>
-      <td>${inputs[0].dataset.type.toUpperCase()}</td>
-      <td>${ext}</td><td>0</td><td>${ext}</td><td>${int}</td><td>${tot}</td>
-      <td class="${status==='PASS'?'pass':'fail'}">${status}</td>
-      <td>-</td>
+      <td>${type}</td><td>${inputs[0].value||0}</td><td class="grace">${grace}</td>
+      <td>${ext}</td><td>${int}</td><td>${total}</td>
+      <td class="${status==='PASS'?'pass':'fail'}">${status}</td><td>${remark}</td>
     </tr>`;
   });
   document.getElementById("overall").innerText="Overall: "+overall;
@@ -196,7 +227,6 @@ function resetAll(){
   document.getElementById("overall").innerText="";
 }
 
-// PDF Export
 function downloadPDF(){
   const { jsPDF } = window.jspdf;
   const doc=new jsPDF({orientation:"portrait",unit:"pt",format:"a4"});
@@ -207,4 +237,4 @@ function downloadPDF(){
 }
 </script>
 </body>
-</html>
+  </html>
