@@ -3,31 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MSU Result Calculator (with Grace)</title>
+<title>MSU Result Calculator (Mobile 3D UI)</title>
 <style>
-  body{font-family:Arial,Helvetica,sans-serif;background:#f7f9fb;margin:0;padding:0}
-  header{background:#0056a3;color:#fff;padding:15px;text-align:center}
-  header h1{margin:0;font-size:22px}
-  header p{font-size:12px;font-weight:bold;margin-top:6px}
-  main{max-width:1000px;margin:20px auto;padding:20px;background:#fff;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1)}
-  .row{margin:10px 0}
-  label{margin-right:10px}
-  select,input{padding:6px;margin:5px}
-  button{padding:8px 16px;background:#0056a3;color:#fff;border:none;border-radius:5px;cursor:pointer}
-  button:hover{background:#004080}
-  h3{margin-top:25px;color:#333;border-bottom:2px solid #eee;padding-bottom:5px}
-  table{width:100%;border-collapse:collapse;margin-top:15px}
-  th,td{border:1px solid #ccc;padding:8px;text-align:center;font-size:14px}
-  th{background:#0056a3;color:#fff}
+  body{font-family:Arial,Helvetica,sans-serif;background:#eef2f5;margin:0;padding:0}
+  header{background:#004080;color:#fff;padding:15px;text-align:center;box-shadow:0 3px 6px rgba(0,0,0,0.2)}
+  header h1{margin:0;font-size:18px}
+  header p{font-size:10px;margin-top:5px}
+  main{max-width:900px;margin:15px auto;padding:15px;background:#fff;border-radius:10px;
+       box-shadow:0 5px 12px rgba(0,0,0,0.15)}
+  .row{margin:10px 0;display:flex;flex-wrap:wrap;gap:10px}
+  label{font-size:12px}
+  select,input{padding:6px;font-size:12px;border:1px solid #bbb;border-radius:6px}
+  input[type=number]{width:38px;text-align:center}
+  button{padding:6px 10px;background:#0056a3;color:#fff;border:none;border-radius:6px;
+         box-shadow:0 3px 6px rgba(0,0,0,0.2);cursor:pointer;font-size:12px}
+  button:hover{background:#003d73}
+  h3{margin-top:20px;color:#333;border-bottom:1px solid #ddd;padding-bottom:5px}
+  .inputRow{margin:6px 0;padding:6px;background:#f9fbff;border-radius:8px;
+            box-shadow:inset 0 2px 4px rgba(0,0,0,0.1);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .inputRow label{font-weight:bold;font-size:12px}
+  .removeBtn{background:#d9534f !important}
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:12px}
+  th,td{border:1px solid #ccc;padding:6px;text-align:center}
+  th{background:#004080;color:#fff}
   .pass{color:green;font-weight:bold}
   .fail{color:red;font-weight:bold}
   .grace{color:#c77700;font-weight:bold}
+  #note{margin-top:15px;font-size:11px;color:#555}
 </style>
 </head>
 <body>
 <header>
-  <h1>MSU Result Calculator (NEP UG/PG with Grace)</h1>
-  <p>यह Maa Shakumbhari University की कोई अधिकारिक साईट/ऐप नहीं है। केवल NEP Result और Grace Marks गणना के लिए बनाया गया है। यह केवल सूचना हेतु है, कहीं भी इसका प्रयोग न करें। Result गणना में त्रुटि संभव है।</p>
+  <h1>MSU Result Calculator (Mobile Friendly)</h1>
+  <p>यह Maa Shakumbhari University की कोई अधिकारिक साईट/ऐप नहीं है। केवल NEP Result और Grace Marks गणना के लिए बनाया गया है। Result गणना में त्रुटि संभव है।</p>
 </header>
 
 <main>
@@ -41,233 +49,162 @@
       </select>
     </label>
     <label>Course:
-      <select id="courseSelect">
-        <option value="">-- Select --</option>
-        <option>B.A.</option>
-        <option>B.Sc.</option>
-        <option>B.Com.</option>
-        <option>M.A.</option>
-        <option>M.Sc.</option>
-        <option>M.Com.</option>
-      </select>
+      <select id="courseSelect"><option value="">-- Select --</option></select>
     </label>
     <label>Semester:
-      <select id="semSelect">
-        <option value="">-- Select --</option>
-        <option>1</option><option>2</option><option>3</option><option>4</option>
-        <option>5</option><option>6</option>
-      </select>
+      <select id="semSelect"><option value="">-- Select --</option></select>
     </label>
   </div>
 
-  <!-- Major Theory -->
-  <h3>Major Theory Subjects</h3>
-  <div id="majTheory">
-    <input class="mtExt" placeholder="External Marks (75)">
-    <input class="mtInt" placeholder="Internal Marks (25)">
-    <br>
-    <input class="mtExt" placeholder="External Marks (75)">
-    <input class="mtInt" placeholder="Internal Marks (25)">
-    <br>
-    <input class="mtExt" placeholder="External Marks (75)">
-    <input class="mtInt" placeholder="Internal Marks (25)">
-  </div>
+  <!-- Subject Add Buttons -->
+  <div id="subjectButtons"></div>
 
-  <!-- Major Practical -->
-  <h3>Major Practical</h3>
-  <div id="majPrac">
-    <input class="mpExt" placeholder="External Marks (75)">
-    <input class="mpInt" placeholder="Internal Marks (25)">
-  </div>
-
-  <!-- Minor -->
-  <h3>Minor Subject</h3>
-  <div id="minorBox" style="display:none">
-    <input class="mnExt" placeholder="External Marks (75)">
-    <input class="mnInt" placeholder="Internal Marks (25)">
-  </div>
-  <button type="button" onclick="document.getElementById('minorBox').style.display='block'">+ Add Minor</button>
-
-  <!-- Skill -->
-  <h3>Skill Development</h3>
-  <div id="skillBox" style="display:none">
-    <input class="skExt" placeholder="Theory Marks (40)">
-    <input class="skInt" placeholder="Practical Marks (60)">
-  </div>
-  <button type="button" onclick="document.getElementById('skillBox').style.display='block'">+ Add Skill</button>
-
-  <!-- Co Curricular -->
-  <h3>Co-Curricular</h3>
-  <input class="coExternal" placeholder="External Marks (75)">
-  <input class="coInternal" placeholder="Internal Marks (25)">
-
-  <!-- Project -->
-  <h3>Project / Dissertation</h3>
-  <div id="projectBox" style="display:none">
-    <input class="prjMarks" placeholder="Project Marks">
-  </div>
-  <button type="button" onclick="document.getElementById('projectBox').style.display='block'">+ Add Project</button>
+  <!-- Subject Containers -->
+  <div id="subjectContainer"></div>
 
   <div class="row">
-    <button type="button" onclick="calculateResult()">Calculate Result</button>
+    <button type="button" onclick="calculateResult()">Calculate</button>
+    <button type="button" onclick="resetAll()">Reset</button>
+    <button type="button" onclick="downloadPDF()">Download PDF</button>
   </div>
 
   <!-- Result Table -->
   <table id="resultTable">
     <thead>
       <tr>
-        <th>Subject</th><th>Ext Marks</th><th>Grace</th><th>Ext (After Grace)</th><th>Int</th><th>Total</th><th>Status</th><th>Remark</th>
+        <th>Subj</th><th>EXT</th><th>Grace</th><th>EXT+</th><th>INT</th><th>Total</th><th>Status</th><th>Remark</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
   <h3 id="overall"></h3>
+
+  <!-- Abbreviation Note -->
+  <div id="note">
+    <b>Note:</b><br>
+    EXT = External, INT = Internal, TH. = Theory, PH. = Practical, CO-CR. = Co-Curricular, SKILL = Skill Development, PROJ. = Project
+  </div>
 </main>
 
+<!-- jsPDF & AutoTable -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
 <script>
-  let PROGRAM="";
+let PROGRAM=""; let subjId=0;
 
-  function setProgram(){ PROGRAM=document.getElementById("programSelect").value; }
+function setProgram(){
+  PROGRAM=document.getElementById("programSelect").value;
+  const courseSel=document.getElementById("courseSelect");
+  const semSel=document.getElementById("semSelect");
+  const btnBox=document.getElementById("subjectButtons");
+  const container=document.getElementById("subjectContainer");
 
-  // --------- Config ----------
-  const UG_PASS_TOTAL_MIN   = 33;     
-  const PG_PASS_TOTAL_MIN   = 40;     
-  const PASS_UE_MIN         = 25;     
-  const UG_PROJECT_PASS     = 40;     
-  const PG_PROJECT_PASS     = 200;    
-  const UG_CO_PASS          = 33;     
-  const UG_SKILL_PASS       = 40;     
-  const UG_MAX_GRACE        = 5;      
-  const PG_MAX_GRACE_SUB1   = 5;      
-  const PG_MAX_GRACE_SUB2   = 3;      
+  courseSel.innerHTML='<option value="">-- Select --</option>';
+  semSel.innerHTML='<option value="">-- Select --</option>';
+  btnBox.innerHTML=""; container.innerHTML="";
 
-  function checkPass(subj, extNow){
-    const total = extNow + subj.internal;
-    if(subj.type==="major"||subj.type==="minor"||subj.type==="majorPractical"){
-      const minTotal = (PROGRAM==="UG") ? UG_PASS_TOTAL_MIN : PG_PASS_TOTAL_MIN;
-      if(extNow < PASS_UE_MIN) return false;
-      return total >= minTotal;
-    }
-    if(subj.type==="skill"){ return total >= UG_SKILL_PASS; }
-    if(subj.type==="co"){ return total >= UG_CO_PASS; }
-    if(subj.type==="project"){
-      if(PROGRAM==="UG") return total >= UG_PROJECT_PASS;
-      if(PROGRAM==="PG") return total >= PG_PROJECT_PASS;
-    }
-    return false;
-  }
-
-  function applyGrace(subjects){
-    let failedSubs = subjects.filter(s=> !checkPass(s,s.ext));
-    if(failedSubs.length===0) return;
-
-    if(PROGRAM==="UG"){
-      let applied = 0;
-      for(let i=0;i<failedSubs.length && applied<2;i++){
-        let s = failedSubs[i];
-        if(["major","minor","majorPractical","skill","co"].includes(s.type)){
-          let needUE = (s.ext<PASS_UE_MIN) ? (PASS_UE_MIN-s.ext) : 0;
-          let needTot = (UG_PASS_TOTAL_MIN-(s.ext+s.internal));
-          if(s.type==="skill") needTot=(UG_SKILL_PASS-(s.ext+s.internal));
-          if(s.type==="co") needTot=(UG_CO_PASS-(s.ext+s.internal));
-          if(s.type==="project") needTot=(UG_PROJECT_PASS-(s.ext+s.internal));
-          let need = Math.max(needUE, needTot);
-          if(need>0 && need<=UG_MAX_GRACE){
-            s.ext += need; s.grace += need; applied++;
-          }
-        }
-      }
-    }
-
-    if(PROGRAM==="PG"){
-      let applied=0;
-      for(let i=0;i<failedSubs.length && applied<2;i++){
-        let s = failedSubs[i];
-        if(["major","minor","majorPractical"].includes(s.type)){
-          let needUE = (s.ext<PASS_UE_MIN) ? (PASS_UE_MIN-s.ext) : 0;
-          let needTot = (PG_PASS_TOTAL_MIN-(s.ext+s.internal));
-          let need = Math.max(needUE, needTot);
-          if(need>0){
-            let allow = (applied===0) ? PG_MAX_GRACE_SUB1 : PG_MAX_GRACE_SUB2;
-            if(need<=allow){
-              s.ext += need; s.grace += need; applied++;
-            }
-          }
-        }
-      }
-    }
-
-    let anyFail = subjects.some(s=> !checkPass(s,s.ext));
-    if(anyFail){
-      subjects.forEach(s=>{ if(s.grace>0){ s.ext -= s.grace; s.grace=0; } });
-    }
-  }
-
-  function calculateResult(){
-    if(!PROGRAM){ alert("Please select Program (UG/PG)."); return; }
-
-    let subjects=[]; 
-    function pushGroup(extCls,intCls,type,display){
-      const exts=document.querySelectorAll("."+extCls);
-      const ints=intCls?document.querySelectorAll("."+intCls):[];
-      exts.forEach((el,i)=>{
-        const ext = Number(el.value)||0;
-        const intr= intCls? (Number(ints[i].value)||0) : 0;
-        if(ext||intr){
-          subjects.push({name:`${display} ${i+1}`, type, ext, internal:intr, grace:0});
-        }
-      });
-    }
-    pushGroup("mtExt","mtInt","major","Major Theory");
-    pushGroup("mpExt","mpInt","majorPractical","Major Practical");
-    if(document.getElementById("minorBox").style.display!=="none") pushGroup("mnExt","mnInt","minor","Minor");
-    if(document.getElementById("skillBox").style.display!=="none") pushGroup("skExt","skInt","skill","Skill");
-    const coE=Number(document.querySelector(".coExternal").value)||0;
-    const coI=Number(document.querySelector(".coInternal").value)||0;
-    if(coE||coI) subjects.push({name:"Co-Curricular", type:"co", ext:coE, internal:coI, grace:0});
-    if(document.getElementById("projectBox").style.display!=="none") pushGroup("prjMarks",null,"project","Project/Dissertation");
-
-    if(subjects.length===0){ alert("Please enter some marks first."); return; }
-
-    applyGrace(subjects);
-
-    const tbody=document.querySelector("#resultTable tbody"); tbody.innerHTML="";
-    subjects.forEach(subj=>{
-      const total=subj.ext+subj.internal;
-      const passNow = checkPass(subj,subj.ext);
-      let status = passNow ? "Pass":"Fail";
-      let remark = passNow ? "OK":"";
-      if(!passNow){
-        if(["major","minor","majorPractical"].includes(subj.type)){
-          if(subj.ext<PASS_UE_MIN) remark=`Need ${PASS_UE_MIN-subj.ext} more in External`;
-          else remark=`Need more in Total`;
-        }
-      }
-      if(subj.grace>0) remark=`Grace Applied: ${subj.grace}`;
-      const tr=document.createElement("tr");
-      tr.innerHTML=`
-        <td>${subj.name}</td>
-        <td>${subj.ext - subj.grace}</td>
-        <td class="grace">${subj.grace}</td>
-        <td>${subj.ext}</td>
-        <td>${subj.internal}</td>
-        <td>${total}</td>
-        <td class="${status==='Pass'?'pass':'fail'}">${status}</td>
-        <td>${remark}</td>
-      `;
-      tbody.appendChild(tr);
+  if(PROGRAM==="UG"){
+    ["B.A.","B.Sc.","B.Com."].forEach(c=>{
+      let op=document.createElement("option"); op.text=c; courseSel.add(op);
     });
+    for(let i=1;i<=6;i++){ let op=document.createElement("option"); op.text=i; semSel.add(op); }
 
-    const overallEl=document.getElementById("overall");
-    if(subjects.some(s=> !checkPass(s,s.ext))){
-      overallEl.innerHTML=`Overall Result: <span class="fail">FAIL (ग्रेस मिलने के बाद भी बैक है)</span>`;
-    } else {
-      const g=subjects.reduce((sum,s)=> sum+s.grace,0);
-      overallEl.innerHTML = g>0 ? 
-        `Overall Result: <span class="pass">PASS with Grace (${g} Marks)</span>` :
-        `Overall Result: <span class="pass">PASS</span>`;
-    }
+    btnBox.innerHTML=`
+      <button onclick="addSubject('major')">+ Major TH.</button>
+      <button onclick="addSubject('majorPractical')">+ Major PH.</button>
+      <button onclick="addSubject('minor')">+ Minor</button>
+      <button onclick="addSubject('skill')">+ SKILL</button>
+      <button onclick="addSubject('co')">+ CO-CR.</button>
+      <button onclick="addSubject('project')">+ PROJ.</button>`;
   }
+  else if(PROGRAM==="PG"){
+    ["M.A.","M.Sc.","M.Com."].forEach(c=>{
+      let op=document.createElement("option"); op.text=c; courseSel.add(op);
+    });
+    for(let i=1;i<=4;i++){ let op=document.createElement("option"); op.text=i; semSel.add(op); }
+
+    btnBox.innerHTML=`
+      <button onclick="addSubject('major')">+ Major TH.</button>
+      <button onclick="addSubject('majorPractical')">+ Major PH.</button>
+      <button onclick="addSubject('minor')">+ Minor</button>
+      <button onclick="addSubject('project')">+ PROJ.</button>`;
+  }
+}
+
+function addSubject(type){
+  subjId++;
+  const box=document.getElementById("subjectContainer");
+  let html="";
+  if(type==="major"||type==="minor"||type==="majorPractical"||type==="co"){
+    html=`<div class="inputRow" id="row${subjId}">
+      <label>${type.toUpperCase()}:</label>
+      EXT <input type="number" maxlength="2" data-type="${type}" data-kind="ext">
+      INT <input type="number" maxlength="2" data-type="${type}" data-kind="int">
+      <button class="removeBtn" onclick="removeSubject(${subjId})">x</button>
+    </div>`;
+  }
+  else if(type==="skill"){
+    html=`<div class="inputRow" id="row${subjId}">
+      <label>SKILL:</label>
+      TH. <input type="number" maxlength="2" data-type="skill" data-kind="ext">
+      PH. <input type="number" maxlength="2" data-type="skill" data-kind="int">
+      <button class="removeBtn" onclick="removeSubject(${subjId})">x</button>
+    </div>`;
+  }
+  else if(type==="project"){
+    html=`<div class="inputRow" id="row${subjId}">
+      <label>PROJ.:</label>
+      Marks <input type="number" maxlength="3" data-type="project" data-kind="ext">
+      <button class="removeBtn" onclick="removeSubject(${subjId})">x</button>
+    </div>`;
+  }
+  box.insertAdjacentHTML("beforeend",html);
+}
+function removeSubject(id){document.getElementById("row"+id).remove();}
+
+// Placeholder calculation (replace with real grace logic)
+function calculateResult(){
+  const tbody=document.querySelector("#resultTable tbody");
+  tbody.innerHTML="";
+  let rows=document.querySelectorAll("#subjectContainer .inputRow");
+  let overall="PASS";
+  rows.forEach(r=>{
+    let inputs=r.querySelectorAll("input");
+    let ext=Number(inputs[0].value||0);
+    let int=inputs[1]?Number(inputs[1].value||0):0;
+    let tot=ext+int;
+    let status=tot>=33?"PASS":"FAIL";
+    if(status==="FAIL")overall="FAIL";
+    tbody.innerHTML+=`<tr>
+      <td>${inputs[0].dataset.type.toUpperCase()}</td>
+      <td>${ext}</td><td>0</td><td>${ext}</td><td>${int}</td><td>${tot}</td>
+      <td class="${status==='PASS'?'pass':'fail'}">${status}</td>
+      <td>-</td>
+    </tr>`;
+  });
+  document.getElementById("overall").innerText="Overall: "+overall;
+}
+
+function resetAll(){
+  document.getElementById("programSelect").value="";
+  document.getElementById("courseSelect").innerHTML="<option>-- Select --</option>";
+  document.getElementById("semSelect").innerHTML="<option>-- Select --</option>";
+  document.getElementById("subjectButtons").innerHTML="";
+  document.getElementById("subjectContainer").innerHTML="";
+  document.querySelector("#resultTable tbody").innerHTML="";
+  document.getElementById("overall").innerText="";
+}
+
+// PDF Export
+function downloadPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc=new jsPDF({orientation:"portrait",unit:"pt",format:"a4"});
+  doc.setFontSize(14);
+  doc.text("MSU Grade Card",220,30);
+  doc.autoTable({html:"#resultTable",startY:50,theme:"grid",styles:{fontSize:9}});
+  doc.save("GradeCard.pdf");
+}
 </script>
 </body>
 </html>
